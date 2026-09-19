@@ -49,52 +49,21 @@ function vt(seed: number): Particle[] {
   const o = wt(seed);
   const i: Particle[] = [];
 
-  for (let b = 0; b < 110; b++) {
+  // Tiny sharp blue-white stars (1-2px, few with soft glow, fewer and smaller)
+  for (let b = 0; b < 65; b++) {
+    const isGlow = o() > 0.85;
     i.push({
-      x: -30 + o() * 684,
-      y: -30 + o() * 390,
-      r: 0.5 + o() * o() * 2.2,
-      a: 0.25 + o() * 0.55,
-      vy: -(1.5 + o() * 4.5),
-      vx: (o() - 0.5) * 2,
-      appear: o() * 2.8,
-      tw: 0.7 + o() * 2.2,
+      x: -20 + o() * 664,
+      y: -20 + o() * 380,
+      r: isGlow ? 1.2 + o() * 0.8 : 0.5 + o() * 0.6,
+      a: isGlow ? 0.45 + o() * 0.45 : 0.20 + o() * 0.50,
+      vy: -(0.5 + o() * 1.5),
+      vx: (o() - 0.5) * 0.8,
+      appear: o() * 2.0,
+      tw: 0.6 + o() * 1.8,
       ph: o() * 6.28,
       bokeh: false,
-      colorType: o() > 0.4 ? 0 : 1,
-    });
-  }
-
-  for (let b = 0; b < 100; b++) {
-    const colRnd = o();
-    i.push({
-      x: -40 + o() * 704,
-      y: 160 + o() * 230,
-      r: 0.75 + o() * 2.2,
-      a: 0.35 + o() * 0.58,
-      vy: -(0.6 + o() * 1.8),
-      vx: (o() - 0.5) * 1.6,
-      appear: o() * 1.6,
-      tw: 0.9 + o() * 2.4,
-      ph: o() * 6.28,
-      bokeh: false,
-      colorType: colRnd > 0.6 ? 0 : colRnd > 0.25 ? 1 : 2,
-    });
-  }
-
-  for (let b = 0; b < 38; b++) {
-    i.push({
-      x: -30 + o() * 684,
-      y: 120 + o() * 270,
-      r: 3.5 + o() * 8.5,
-      a: 0.05 + o() * 0.13,
-      vy: -(1.0 + o() * 2.5),
-      vx: (o() - 0.5) * 2.2,
-      appear: 1.0 + o() * 2.2,
-      tw: 0.4 + o() * 1.2,
-      ph: o() * 6.28,
-      bokeh: true,
-      colorType: o() > 0.5 ? 1 : 2,
+      colorType: o() > 0.35 ? 0 : 1, // mostly white and soft blue
     });
   }
 
@@ -376,8 +345,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
     t.setTransform(1, 0, 0, 1, 0, 0);
     t.globalCompositeOperation = "source-over";
     t.globalAlpha = 1;
-    t.fillStyle = "#010113";
-    t.fillRect(0, 0, N, z);
+    t.clearRect(0, 0, N, z);
     t.setTransform(A, 0, 0, A, U, J);
 
     const { R: c, cy: p } = At(e);
@@ -506,12 +474,13 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
       }
     }
 
-    t.save();
-    t.beginPath();
-    t.arc(312, p, c, 0, Math.PI * 2);
-    t.clip();
-    bt(e);
-    t.restore();
+    // Legacy 2D canvas donut disabled - replaced by 3D Three.js wheel
+    // t.save();
+    // t.beginPath();
+    // t.arc(312, p, c, 0, Math.PI * 2);
+    // t.clip();
+    // bt(e);
+    // t.restore();
 
     canvas.style.opacity = "1";
     t.globalCompositeOperation = "source-over";

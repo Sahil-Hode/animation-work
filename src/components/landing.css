@@ -64,6 +64,89 @@
   pointer-events: none;
 }
 
+/* ---------- Eclipse Sphere (Style Reference Matching Image 2) ---------- */
+.lp-eclipse-sphere-wrap {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  width: clamp(290px, 31vw, 430px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  z-index: 0; /* Behind big outer arc canvas (z-index: 1) and wordmark (z-index: 2) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: sphere-breathe 8s ease-in-out infinite;
+}
+
+.lp-eclipse-sphere-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.es-crescent-group {
+  transform-origin: 250px 250px;
+  animation: sphere-crescent-orbit 30s linear infinite;
+}
+
+.es-circle-drift-1 {
+  transform-origin: 250px 250px;
+  animation: sphere-drift-1 50s linear infinite reverse;
+}
+
+.es-circle-drift-2 {
+  transform-origin: 250px 250px;
+  animation: sphere-drift-2 65s linear infinite;
+}
+
+@keyframes sphere-breathe {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.015);
+  }
+}
+
+@keyframes sphere-crescent-orbit {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sphere-drift-1 {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sphere-drift-2 {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-eclipse-sphere-wrap,
+  .es-crescent-group,
+  .es-circle-drift-1,
+  .es-circle-drift-2 {
+    animation: none !important;
+  }
+}
+
 .lp-hero {
   position: relative;
   isolation: isolate;
