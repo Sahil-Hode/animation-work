@@ -1,20 +1,22 @@
-"use client";
-
 import React from "react";
 
+/**
+ * EclipseSphere: Style Reference Matching Component
+ *
+ * Implements the cosmic planet / eclipse sphere matching Image 2 reference:
+ * - Upper hemisphere visible with cut-to-cut alignment matching the big glowing arc.
+ * - Everything below the arc is cleanly clipped / hidden as requested.
+ * - Layer 1: Dark spherical body with deep navy & electric-blue glow
+ * - Layer 2: Main rim perimeter with electric-blue to violet stroke
+ * - Layer 3: Second inner circle (~85% size) with subtle drift
+ * - Layer 4: Third faint circle (~105% size) with reverse drift
+ * - Layer 5: Bright white-to-lavender crescent along upper-right quadrant
+ * - Layer 6: Flare bloom at ~1:30 o'clock with white core and subtle pink halo
+ */
 export function EclipseSphere() {
-  // Crescent path calculated for radius 190, center (250, 250), from 12 o'clock (-90deg) to 4 o'clock (30deg),
-  // with peak thickness of 22px at ~1:30 o'clock (-45deg), tapering smoothly to 0 at both tips.
-  const crescentPath =
-    "M 250.0 60.0 L 266.56 60.72 L 282.99 62.89 L 299.18 66.47 L 314.98 71.46 L 330.3 77.8 " +
-    "L 345.0 85.46 L 358.98 94.36 L 372.13 104.45 L 384.35 115.65 L 395.55 127.87 L 405.64 141.02 " +
-    "L 414.54 155.0 L 422.2 169.7 L 428.54 185.02 L 433.53 200.82 L 437.11 217.01 L 439.28 233.44 " +
-    "L 440.0 250.0 L 439.28 266.56 L 437.11 282.99 L 433.53 299.18 L 428.54 314.98 L 422.2 330.3 " +
-    "L 414.54 345.0 L 414.54 345.0 L 419.6 329.08 L 423.19 313.04 L 425.39 297.0 L 426.28 281.08 " +
-    "L 425.94 265.39 L 424.44 250.0 L 421.89 234.96 L 418.35 220.32 L 413.89 206.08 L 408.57 192.28 " +
-    "L 402.43 178.92 L 395.49 166.0 L 387.77 153.53 L 379.27 141.53 L 369.98 130.02 L 359.88 119.05 " +
-    "L 348.97 108.66 L 337.22 98.93 L 324.64 89.94 L 311.22 81.8 L 297.0 74.61 L 282.0 68.49 " +
-    "L 266.31 63.58 L 250.0 60.0 Z";
+  // Precomputed smooth cubic bezier SVG path for the upper-right crescent (12 to 4 o'clock)
+  // Inner rim radius ~168px, outer rim radius 190px, peak thickness ~22px at ~1:30-2:00
+  const crescentPath = "M 250.0 60.0 L 256.63 60.12 L 263.25 60.46 L 269.86 61.04 L 276.44 61.85 L 282.99 62.89 L 289.5 64.15 L 295.97 65.64 L 302.37 67.36 L 308.71 69.3 L 314.98 71.46 L 321.18 73.84 L 327.28 76.43 L 333.29 79.23 L 339.2 82.24 L 345.0 85.46 L 350.68 88.87 L 356.25 92.48 L 361.68 96.29 L 366.98 100.28 L 372.13 104.45 L 377.13 108.8 L 381.99 113.33 L 386.67 118.01 L 391.2 122.87 L 395.55 127.87 L 399.72 133.02 L 403.71 138.32 L 407.52 143.75 L 411.13 149.32 L 414.54 155.0 L 417.76 160.8 L 420.77 166.71 L 423.57 172.72 L 426.16 178.82 L 428.54 185.02 L 430.7 191.29 L 432.64 197.63 L 434.36 204.03 L 435.85 210.5 L 437.11 217.01 L 438.15 223.56 L 438.96 230.14 L 439.54 236.75 L 439.88 243.37 L 440.0 250.0 L 439.88 256.63 L 439.54 263.25 L 438.96 269.86 L 438.15 276.44 L 437.11 282.99 L 435.85 289.5 L 434.36 295.97 L 432.64 302.37 L 430.7 308.71 L 428.54 314.98 L 426.16 321.18 L 423.57 327.28 L 420.77 333.29 L 417.76 339.2 L 414.54 345.0 L 411.13 350.68 L 407.52 356.25 L 403.71 361.68 L 399.72 366.98 L 395.55 372.13 L 391.2 377.13 L 386.67 381.99 L 386.54 381.86 L 390.64 376.63 L 394.43 371.19 L 397.94 365.59 L 401.19 359.85 L 404.18 354.0 L 406.91 348.05 L 409.39 342.03 L 411.63 335.94 L 413.62 329.8 L 415.37 323.63 L 416.89 317.43 L 418.19 311.21 L 419.26 305.0 L 420.12 298.78 L 420.78 292.58 L 421.23 286.4 L 421.49 280.24 L 421.56 274.11 L 421.45 268.02 L 421.16 261.97 L 420.71 255.96 L 420.09 250.0 L 419.32 244.09 L 418.4 238.22 L 417.32 232.41 L 416.11 226.65 L 414.76 220.95 L 413.27 215.29 L 411.66 209.69 L 409.91 204.15 L 408.04 198.65 L 406.04 193.21 L 403.91 187.81 L 401.67 182.47 L 399.29 177.19 L 396.79 171.95 L 394.17 166.76 L 391.42 161.63 L 388.54 156.56 L 385.52 151.54 L 382.38 146.58 L 379.09 141.68 L 375.67 136.84 L 372.11 132.08 L 368.4 127.39 L 364.55 122.78 L 360.55 118.25 L 356.39 113.82 L 352.09 109.49 L 347.63 105.26 L 343.01 101.15 L 338.24 97.16 L 333.32 93.3 L 328.24 89.59 L 323.0 86.03 L 317.62 82.64 L 312.09 79.42 L 306.41 76.39 L 300.59 73.56 L 294.64 70.94 L 288.57 68.55 L 282.37 66.4 L 276.07 64.5 L 269.67 62.88 L 263.18 61.55 L 256.62 60.56 L 250.0 60.0 Z";
 
   return (
     <div className="lp-eclipse-sphere-wrap" aria-hidden="true">
@@ -25,6 +27,11 @@ export function EclipseSphere() {
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
+          {/* Arc Clip Path: cleanly hides all sphere elements below the big glowing arc */}
+          <clipPath id="es-above-arc-clip">
+            <path d="M -100 -100 L 600 -100 L 600 292 A 840 840 0 0 1 -100 292 Z" />
+          </clipPath>
+
           {/* Layer 1: Sphere body radial gradient */}
           <radialGradient id="es-sphere-body" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#02031a" stopOpacity="0.96" />
@@ -75,15 +82,6 @@ export function EclipseSphere() {
             <stop offset="100%" stopColor="#3d5cff" stopOpacity="0.0" />
           </radialGradient>
 
-          {/* Layer 7: Bottom glint gradient (subtle violet-pink) */}
-          <linearGradient id="es-bottom-glint" x1="100%" y1="0%" x2="0%" y2="0%">
-            <stop offset="0%" stopColor="#a45cff" stopOpacity="0.0" />
-            <stop offset="25%" stopColor="#a45cff" stopOpacity="0.55" />
-            <stop offset="50%" stopColor="#ff4fd8" stopOpacity="0.85" />
-            <stop offset="75%" stopColor="#a45cff" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#a45cff" stopOpacity="0.0" />
-          </linearGradient>
-
           {/* Filters for soft glows */}
           <filter id="es-rim-glow" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="3.5" result="blur" />
@@ -117,90 +115,75 @@ export function EclipseSphere() {
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
-
-          <filter id="es-glint-glow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="3.0" result="glow" />
-            <feMerge>
-              <feMergeNode in="glow" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
         </defs>
 
-        {/* 1. Sphere body */}
-        <circle cx="250" cy="250" r="190" fill="url(#es-sphere-body)" />
+        {/* Clip everything below the arc so only the upper part is visible */}
+        <g clipPath="url(#es-above-arc-clip)">
+          {/* 1. Sphere body */}
+          <circle cx="250" cy="250" r="190" fill="url(#es-sphere-body)" />
 
-        {/* 2. Main rim line (1.8px, glowing electric-blue to violet) */}
-        <circle
-          cx="250"
-          cy="250"
-          r="190"
-          fill="none"
-          stroke="url(#es-main-rim)"
-          strokeWidth="1.8"
-          filter="url(#es-rim-glow)"
-        />
-
-        {/* 3. Second circle (~85% size, shifted slightly up and left) */}
-        <g className="es-circle-drift-1">
+          {/* 2. Main rim line (1.8px, glowing electric-blue to violet) */}
           <circle
-            cx="244"
-            cy="240"
-            r="161.5"
+            cx="250"
+            cy="250"
+            r="190"
             fill="none"
-            stroke="url(#es-second-circle)"
-            strokeWidth="1.2"
-          />
-        </g>
-
-        {/* 4. Third faint circle (~105% size, offset to lower-left, partial arc) */}
-        <g className="es-circle-drift-2">
-          <circle
-            cx="246"
-            cy="255"
-            r="199.5"
-            fill="none"
-            stroke="url(#es-third-circle)"
-            strokeWidth="1.0"
-          />
-        </g>
-
-        {/* 7. Bottom glint: subtle violet-pink glow on lower rim */}
-        <path
-          d="M 336.3 419.3 A 190 190 0 0 1 163.7 419.3"
-          fill="none"
-          stroke="url(#es-bottom-glint)"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          filter="url(#es-glint-glow)"
-        />
-
-        {/* 5 & 6. Bright crescent and flare group (slowly rotates along the rim) */}
-        <g className="es-crescent-group">
-          {/* Layer 5: Bright crescent on upper-right edge */}
-          <path
-            d={crescentPath}
-            fill="url(#es-crescent-grad)"
-            filter="url(#es-crescent-glow)"
+            stroke="url(#es-main-rim)"
+            strokeWidth="1.8"
+            filter="url(#es-rim-glow)"
           />
 
-          {/* Layer 6: Flare hot bloom at the thickest point (~1:30 o'clock, 384, 116) */}
-          <g transform="translate(384, 116) rotate(42)">
-            <ellipse
-              cx="0"
-              cy="0"
-              rx="40"
-              ry="18"
-              fill="url(#es-flare-bloom)"
-              filter="url(#es-flare-glow)"
+          {/* 3. Second circle (~85% size, shifted slightly up and left) */}
+          <g className="es-circle-drift-1">
+            <circle
+              cx="244"
+              cy="240"
+              r="161.5"
+              fill="none"
+              stroke="url(#es-second-circle)"
+              strokeWidth="1.2"
             />
-            <ellipse
-              cx="0"
-              cy="0"
-              rx="20"
-              ry="7"
-              fill="#ffffff"
+          </g>
+
+          {/* 4. Third faint circle (~105% size, offset to lower-left, partial arc) */}
+          <g className="es-circle-drift-2">
+            <circle
+              cx="246"
+              cy="255"
+              r="199.5"
+              fill="none"
+              stroke="url(#es-third-circle)"
+              strokeWidth="1.0"
             />
+          </g>
+
+          {/* 5 & 6. Bright crescent and flare group (slowly rotates along the rim) */}
+          <g className="es-crescent-group">
+            {/* Layer 5: Bright crescent on upper-right edge */}
+            <path
+              d={crescentPath}
+              fill="url(#es-crescent-grad)"
+              filter="url(#es-crescent-glow)"
+            />
+
+            {/* Layer 6: Flare hot bloom at the thickest point (~1:30 o'clock, 384, 116) */}
+            <g transform="translate(384, 116) rotate(42)">
+              <ellipse
+                cx="0"
+                cy="0"
+                rx="40"
+                ry="18"
+                fill="url(#es-flare-bloom)"
+                filter="url(#es-flare-glow)"
+              />
+              <ellipse
+                cx="0"
+                cy="0"
+                rx="20"
+                ry="7"
+                fill="#ffffff"
+              />
+            </g>
           </g>
         </g>
       </svg>

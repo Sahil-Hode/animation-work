@@ -779,6 +779,10 @@
     top: 44%;
   }
 
+  .lp-eclipse-sphere-wrap {
+    top: 45%;
+  }
+
   .glass-donut {
     width: clamp(250px, 66vw, 360px);
   }
