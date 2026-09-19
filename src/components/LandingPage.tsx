@@ -2,6 +2,7 @@ import "./landing.css";
 import { display, sans } from "./fonts";
 import { Hero } from "./Hero";
 import { Navbar } from "./Navbar";
+import { GlassArcSection } from "./GlassArcSection";
 
 export function LandingPage() {
   return (
@@ -9,6 +10,7 @@ export function LandingPage() {
       <Navbar />
       <main>
         <Hero />
+        <GlassArcSection />
       </main>
     </div>
   );

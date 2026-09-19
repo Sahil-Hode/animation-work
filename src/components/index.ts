@@ -5,3 +5,4 @@ export { GlowRing } from "./GlowRing";
 export { BrandWord } from "./BrandWord";
 export { CTAButton } from "./CTAButton";
 export { content } from "./content";
+export { GlassArcSection } from "./GlassArcSection";
