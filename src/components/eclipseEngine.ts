@@ -1,7 +1,6 @@
 /**
  * Eclipse Arc Glow & Particle Engine
- * Rich cobalt/royal blue atmospheric shade above & inside the big arc,
- * transitioning to pure black below the arc.
+ * Big outer arc shifted further upside to sit higher in the hero section.
  */
 
 const L = (n: number, o = 0, i = 1) => Math.min(i, Math.max(o, n));
@@ -43,14 +42,13 @@ interface Particle {
   tw: number;
   ph: number;
   bokeh: boolean;
-  colorType: number; // 0 = white, 1 = ice-blue, 2 = violet
+  colorType: number;
 }
 
 function vt(seed: number): Particle[] {
   const o = wt(seed);
   const i: Particle[] = [];
 
-  // 1. General ambient sky stars (110 particles)
   for (let b = 0; b < 110; b++) {
     i.push({
       x: -30 + o() * 684,
@@ -67,12 +65,11 @@ function vt(seed: number): Particle[] {
     });
   }
 
-  // 2. Dedicated Lower-Field Floating Dots & Stardust (Below the Big Arc - 100 particles)
   for (let b = 0; b < 100; b++) {
     const colRnd = o();
     i.push({
       x: -40 + o() * 704,
-      y: 190 + o() * 200,
+      y: 160 + o() * 230,
       r: 0.75 + o() * 2.2,
       a: 0.35 + o() * 0.58,
       vy: -(0.6 + o() * 1.8),
@@ -85,11 +82,10 @@ function vt(seed: number): Particle[] {
     });
   }
 
-  // 3. Ambient & Lower Bokeh Motes (38 particles)
   for (let b = 0; b < 38; b++) {
     i.push({
       x: -30 + o() * 684,
-      y: 150 + o() * 240,
+      y: 120 + o() * 270,
       r: 3.5 + o() * 8.5,
       a: 0.05 + o() * 0.13,
       vy: -(1.0 + o() * 2.5),
@@ -136,20 +132,20 @@ function createParticleSprite(type: "white" | "blue" | "violet"): HTMLCanvasElem
 }
 
 /**
- * Big outer arc geometry (R = 285)
+ * Big outer arc geometry: Shifted upside (bottom rests at Y = 205)
  */
 function At(n: number) {
   const o = n < 0.46 ? 360 : 285 + 75 * Math.exp(-(n - 0.46) / 0.85);
-  const i = 248 + 14 * Math.exp(-n / 1);
+  const i = 205 + 14 * Math.exp(-n / 1);
   return { R: o, bottom: i, cy: i - o };
 }
 
 /**
- * Inner Glass Arc / Donut geometry
+ * Inner Glass Arc / Donut geometry: Shifted upside to cy = 195
  */
 function Tt(n: number) {
-  const o = 138 + 35 * u(1.3, 2.7, n);
-  return { cx: 312, cy: 236, rx: o, ry: o, rot: 0 };
+  const o = 95 + 23 * u(1.3, 2.7, n);
+  return { cx: 312, cy: 195, rx: o, ry: o, rot: 0 };
 }
 
 export interface EclipseIntroOptions {
@@ -290,7 +286,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
 
     const d = e.cx + e.rx * Math.cos(c);
     const M = e.cy + e.rx * Math.sin(c);
-    const y = 8 + w * 0.6;
+    const y = 6 + w * 0.5;
     const f = t.createRadialGradient(d, M, 0, d, M, y * 2);
     f.addColorStop(0, `rgba(255,255,255,${0.85 * S})`);
     f.addColorStop(0.3, `rgba(${x[0]},${x[1]},${x[2]},${0.45 * S})`);
@@ -301,17 +297,15 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
     t.fill();
   }
 
-  // Upper Glass Arc / Donut
   function bt(e: number) {
     if (!t) return;
     const c = u(1.15, 1.9, e);
     if (c <= 0.001) return;
     const a = Tt(e);
     const outerR = a.rx;
-    const innerR = a.rx - 36;
-    const middleR = a.rx - 18;
+    const innerR = a.rx - 26;
+    const middleR = a.rx - 13;
 
-    // 1. Torus Body: Upper Half-Donut band
     t.save();
     t.beginPath();
     t.arc(a.cx, a.cy, outerR, Math.PI, 0, false);
@@ -334,51 +328,46 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
     t.fillStyle = v;
     t.fill();
 
-    // 2. Outer Semicircular Electric-Blue Rim
     t.beginPath();
     t.arc(a.cx, a.cy, outerR, Math.PI, 0, false);
     t.strokeStyle = `rgba(110, 175, 255, ${0.85 * c})`;
-    t.lineWidth = 3.0;
+    t.lineWidth = 2.4;
     t.stroke();
 
-    // 3. Middle Concentric Semicircular Rim
     t.beginPath();
     t.arc(a.cx, a.cy, middleR, Math.PI, 0, false);
     t.strokeStyle = `rgba(80, 140, 255, ${0.35 * c})`;
-    t.lineWidth = 1.8;
+    t.lineWidth = 1.4;
     t.stroke();
 
-    // 4. Inner Semicircular Rim
     t.beginPath();
     t.arc(a.cx, a.cy, innerR, Math.PI, 0, false);
     t.strokeStyle = `rgba(70, 120, 255, ${0.55 * c})`;
-    t.lineWidth = 2.0;
+    t.lineWidth = 1.6;
     t.stroke();
 
-    // 5. Pink / Magenta Endpoint Glows at inner arc ends
     for (const h of [-1, 1]) {
       const ex = a.cx + h * innerR;
       const ey = a.cy;
-      const eg = t.createRadialGradient(ex, ey, 0, ex, ey, 24);
+      const eg = t.createRadialGradient(ex, ey, 0, ex, ey, 18);
       eg.addColorStop(0, `rgba(255, 170, 235, ${0.9 * c})`);
       eg.addColorStop(0.35, `rgba(210, 130, 255, ${0.55 * c})`);
       eg.addColorStop(0.7, `rgba(120, 100, 255, ${0.25 * c})`);
       eg.addColorStop(1, "rgba(30, 60, 255, 0)");
       t.fillStyle = eg;
       t.beginPath();
-      t.arc(ex, ey, 24, 0, k);
+      t.arc(ex, ey, 18, 0, k);
       t.fill();
     }
     t.restore();
 
-    // 6. Flowing Highlight along the Upper Dome Curve
     const angleProgress = (Math.sin((e - 1.5) * 1.8) + 1) / 2;
     const domeAngle = -Math.PI + 0.15 + angleProgress * (Math.PI - 0.3);
 
-    nt(a, domeAngle, P(18), P(42), 13, c * 0.95, u(1.4, 3.8, e));
+    nt(a, domeAngle, P(18), P(42), 9.5, c * 0.95, u(1.4, 3.8, e));
 
     const secondAngle = -Math.PI + 0.3 + ((angleProgress + 0.4) % 1) * (Math.PI - 0.6);
-    nt(a, secondAngle, P(12), P(24), 8, c * 0.45, 0);
+    nt(a, secondAngle, P(12), P(24), 6, c * 0.45, 0);
   }
 
   function W(e: number) {
@@ -406,32 +395,29 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
 
     t.globalCompositeOperation = "lighter";
 
-    // 1. Reduced blue shade inside/above the Big Arc
     {
       const r = t.createRadialGradient(312, p - 50, 15, 312, p, c * 1.1);
-      r.addColorStop(0, `rgba(18, 48, 220, ${0.22 * v})`);
-      r.addColorStop(0.35, `rgba(14, 32, 170, ${0.14 * v})`);
-      r.addColorStop(0.7, `rgba(8, 18, 100, ${0.06 * v})`);
+      r.addColorStop(0, `rgba(18, 48, 220, ${0.48 * v})`);
+      r.addColorStop(0.35, `rgba(14, 32, 170, ${0.32 * v})`);
+      r.addColorStop(0.7, `rgba(8, 18, 100, ${0.14 * v})`);
       r.addColorStop(1, "rgba(2, 4, 30, 0)");
       t.fillStyle = r;
       t.fillRect(T, R, x, $);
     }
 
-    // 2. Concentric blue halo
     {
       const r = Math.min(1.2, S * 3.4);
       const d = t.createRadialGradient(312, p, 0, 312, p, c);
       d.addColorStop(0, "rgba(20,30,255,0)");
-      d.addColorStop(0.5, `rgba(20,30,255,${0.025 * r})`);
-      d.addColorStop(0.8, `rgba(30,40,255,${0.11 * r})`);
-      d.addColorStop(1, `rgba(70,70,255,${0.38 * r})`);
+      d.addColorStop(0.5, `rgba(20,30,255,${0.06 * r})`);
+      d.addColorStop(0.8, `rgba(30,40,255,${0.26 * r})`);
+      d.addColorStop(1, `rgba(70,70,255,${0.9 * r})`);
       t.fillStyle = d;
       t.beginPath();
       t.arc(312, p, c, 0, Math.PI * 2);
       t.fill();
     }
 
-    // 3. Floating Stardust Dots & Particles (Below arc area is pure black)
     const wrapH = Math.max(380, Math.ceil($ + 50));
     for (const r of it) {
       const d = e - r.appear;
@@ -458,7 +444,6 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
     }
     t.globalAlpha = 1;
 
-    // 4. THE 18-LAYER VOLUMETRIC ARC GLOW
     {
       const r = u(0, 0.08, e);
       const d = 0.5 + 0.45 * u(0, 0.7, e);
@@ -498,7 +483,6 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
       t.globalAlpha = 1;
     }
 
-    // 5. Side flares at big arc intersection
     {
       const r = -p;
       if (c > r && r > 0) {
@@ -522,7 +506,6 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
       }
     }
 
-    // 6. Upper Dome with flowing highlight (CLIPPED strictly above/inside the Big Outer Arc curve)
     t.save();
     t.beginPath();
     t.arc(312, p, c, 0, Math.PI * 2);
@@ -555,7 +538,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
   function dt() {
     if (!H) {
       if (st) {
-        W(3.5);
+        W(4.3);
         onComplete?.();
         return;
       }

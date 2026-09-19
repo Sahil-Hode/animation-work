@@ -80,7 +80,7 @@ var EclipseIntro = (function () {
       const colRnd = o();
       i.push({
         x: -40 + o() * 704,
-        y: 190 + o() * 200,
+        y: 160 + o() * 230,
         r: 0.75 + o() * 2.2,
         a: 0.35 + o() * 0.58,
         vy: -(0.6 + o() * 1.8),
@@ -96,7 +96,7 @@ var EclipseIntro = (function () {
     for (let b = 0; b < 38; b++) {
       i.push({
         x: -30 + o() * 684,
-        y: 150 + o() * 240,
+        y: 120 + o() * 270,
         r: 3.5 + o() * 8.5,
         a: 0.05 + o() * 0.13,
         vy: -(1.0 + o() * 2.5),
@@ -144,13 +144,13 @@ var EclipseIntro = (function () {
 
   function At(n) {
     const o = n < 0.46 ? 360 : 285 + 75 * Math.exp(-(n - 0.46) / 0.85);
-    const i = 248 + 14 * Math.exp(-n / 1);
+    const i = 205 + 14 * Math.exp(-n / 1);
     return { R: o, bottom: i, cy: i - o };
   }
 
   function Tt(n) {
-    const o = 138 + 35 * u(1.3, 2.7, n);
-    return { cx: 312, cy: 236, rx: o, ry: o, rot: 0 };
+    const o = 95 + 23 * u(1.3, 2.7, n);
+    return { cx: 312, cy: 195, rx: o, ry: o, rot: 0 };
   }
 
   function createEclipseIntro(canvas, options = {}) {
@@ -267,7 +267,7 @@ var EclipseIntro = (function () {
 
       const d = e.cx + e.rx * Math.cos(c);
       const M = e.cy + e.rx * Math.sin(c);
-      const y = 8 + w * 0.6;
+      const y = 6 + w * 0.5;
       const f = t.createRadialGradient(d, M, 0, d, M, y * 2);
       f.addColorStop(0, `rgba(255,255,255,${0.85 * S})`);
       f.addColorStop(0.3, `rgba(${x[0]},${x[1]},${x[2]},${0.45 * S})`);
@@ -284,8 +284,8 @@ var EclipseIntro = (function () {
       if (c <= 0.001) return;
       const a = Tt(e);
       const outerR = a.rx;
-      const innerR = a.rx - 36;
-      const middleR = a.rx - 18;
+      const innerR = a.rx - 26;
+      const middleR = a.rx - 13;
 
       t.save();
       t.beginPath();
@@ -312,32 +312,32 @@ var EclipseIntro = (function () {
       t.beginPath();
       t.arc(a.cx, a.cy, outerR, Math.PI, 0, false);
       t.strokeStyle = `rgba(110, 175, 255, ${0.85 * c})`;
-      t.lineWidth = 3.0;
+      t.lineWidth = 2.4;
       t.stroke();
 
       t.beginPath();
       t.arc(a.cx, a.cy, middleR, Math.PI, 0, false);
       t.strokeStyle = `rgba(80, 140, 255, ${0.35 * c})`;
-      t.lineWidth = 1.8;
+      t.lineWidth = 1.4;
       t.stroke();
 
       t.beginPath();
       t.arc(a.cx, a.cy, innerR, Math.PI, 0, false);
       t.strokeStyle = `rgba(70, 120, 255, ${0.55 * c})`;
-      t.lineWidth = 2.0;
+      t.lineWidth = 1.6;
       t.stroke();
 
       for (const h of [-1, 1]) {
         const ex = a.cx + h * innerR;
         const ey = a.cy;
-        const eg = t.createRadialGradient(ex, ey, 0, ex, ey, 24);
+        const eg = t.createRadialGradient(ex, ey, 0, ex, ey, 18);
         eg.addColorStop(0, `rgba(255, 170, 235, ${0.9 * c})`);
         eg.addColorStop(0.35, `rgba(210, 130, 255, ${0.55 * c})`);
         eg.addColorStop(0.7, `rgba(120, 100, 255, ${0.25 * c})`);
         eg.addColorStop(1, "rgba(30, 60, 255, 0)");
         t.fillStyle = eg;
         t.beginPath();
-        t.arc(ex, ey, 24, 0, k);
+        t.arc(ex, ey, 18, 0, k);
         t.fill();
       }
       t.restore();
@@ -345,10 +345,10 @@ var EclipseIntro = (function () {
       const angleProgress = (Math.sin((e - 1.5) * 1.8) + 1) / 2;
       const domeAngle = -Math.PI + 0.15 + angleProgress * (Math.PI - 0.3);
 
-      nt(a, domeAngle, P(18), P(42), 13, c * 0.95, u(1.4, 3.8, e));
+      nt(a, domeAngle, P(18), P(42), 9.5, c * 0.95, u(1.4, 3.8, e));
 
       const secondAngle = -Math.PI + 0.3 + ((angleProgress + 0.4) % 1) * (Math.PI - 0.6);
-      nt(a, secondAngle, P(12), P(24), 8, c * 0.45, 0);
+      nt(a, secondAngle, P(12), P(24), 6, c * 0.45, 0);
     }
 
     function W(e) {
