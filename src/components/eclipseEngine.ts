@@ -1,7 +1,7 @@
 /**
  * Eclipse Arc Glow & Particle Engine
- * Wide celestial arc stretched gracefully across both sides,
- * framing the navbar and hero text with atmospheric stardust.
+ * Precisely calibrated arc that aligns with the outer ends of the navbar pill container,
+ * with floating stardust particles below the big arc.
  */
 
 const L = (n: number, o = 0, i = 1) => Math.min(i, Math.max(o, n));
@@ -137,11 +137,11 @@ function createParticleSprite(type: "white" | "blue" | "violet"): HTMLCanvasElem
 
 /**
  * Big outer arc geometry:
- * Stretched wider on both sides (Radius R ~ 350), with bottom apex resting at Y = 248.
- * This sweeps wide across the viewport and avoids steep narrow U-shape clipping.
+ * Radius calibrated to R = 285 so the arc passes precisely through
+ * the rounded outer end caps of the navbar pill container.
  */
 function At(n: number) {
-  const o = n < 0.46 ? 420 : 350 + 70 * Math.exp(-(n - 0.46) / 0.85);
+  const o = n < 0.46 ? 360 : 285 + 75 * Math.exp(-(n - 0.46) / 0.85);
   const i = 248 + 14 * Math.exp(-n / 1);
   return { R: o, bottom: i, cy: i - o };
 }
@@ -465,7 +465,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
     }
     t.globalAlpha = 1;
 
-    // 5. THE 18-LAYER VOLUMETRIC ARC GLOW (Stretched wide across the screen)
+    // 5. THE 18-LAYER VOLUMETRIC ARC GLOW (Calibrated to navbar pill ends)
     {
       const r = u(0, 0.08, e);
       const d = 0.5 + 0.45 * u(0, 0.7, e);
@@ -491,7 +491,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
       const G = (X: number[], O: number[]) =>
         `rgb(${X.map((Z, B) => Math.round(D(Z, O[B], g))).join(",")})`;
 
-      const I = t.createLinearGradient(-30, 0, 654, 0);
+      const I = t.createLinearGradient(16, 0, 608, 0);
       I.addColorStop(0, G([170, 150, 255], [255, 252, 255]));
       I.addColorStop(0.3, G([120, 100, 255], [195, 190, 255]));
       I.addColorStop(0.5, G([100, 80, 250], [150, 146, 240]));
@@ -505,7 +505,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
       t.globalAlpha = 1;
     }
 
-    // 6. Side flares at big arc intersection (Wider spread outside the navbar)
+    // 6. Side flares at big arc intersection (Positioned directly at navbar outer ends)
     {
       const r = -p;
       if (c > r && r > 0) {
@@ -517,13 +517,13 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
           for (const h of [-1, 1]) {
             const l = 312 + h * f;
             const s = 4;
-            const m = t.createRadialGradient(l, s, 0, l, s, 110);
+            const m = t.createRadialGradient(l, s, 0, l, s, 100);
             m.addColorStop(0, `rgba(255,250,255,${0.85 * y})`);
             m.addColorStop(0.18, `rgba(190,180,255,${0.55 * y})`);
             m.addColorStop(0.5, `rgba(70,70,255,${0.28 * y})`);
             m.addColorStop(1, "rgba(30,30,255,0)");
             t.fillStyle = m;
-            t.fillRect(l - 120, s - 120, 240, 240);
+            t.fillRect(l - 105, s - 105, 210, 210);
           }
         }
       }
