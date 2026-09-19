@@ -1,6 +1,7 @@
 /**
  * Eclipse Arc Glow & Particle Engine
- * Shifted further downward to comfortably position the arc and dome lower in the hero section.
+ * Wide celestial arc stretched gracefully across both sides,
+ * framing the navbar and hero text with atmospheric stardust.
  */
 
 const L = (n: number, o = 0, i = 1) => Math.min(i, Math.max(o, n));
@@ -42,73 +43,116 @@ interface Particle {
   tw: number;
   ph: number;
   bokeh: boolean;
+  colorType: number; // 0 = white, 1 = ice-blue, 2 = violet
 }
 
 function vt(seed: number): Particle[] {
   const o = wt(seed);
   const i: Particle[] = [];
-  for (let b = 0; b < 120; b++) {
+
+  // 1. General ambient sky stars (110 particles)
+  for (let b = 0; b < 110; b++) {
     i.push({
-      x: o() * 624,
-      y: o() * 352,
+      x: -30 + o() * 684,
+      y: -30 + o() * 390,
       r: 0.5 + o() * o() * 2.2,
-      a: 0.25 + o() * 0.6,
-      vy: -(2 + o() * 6),
-      vx: (o() - 0.5) * 3,
-      appear: o() * 3.2,
-      tw: 0.6 + o() * 2,
+      a: 0.25 + o() * 0.55,
+      vy: -(1.5 + o() * 4.5),
+      vx: (o() - 0.5) * 2,
+      appear: o() * 2.8,
+      tw: 0.7 + o() * 2.2,
       ph: o() * 6.28,
       bokeh: false,
+      colorType: o() > 0.4 ? 0 : 1,
     });
   }
-  for (let b = 0; b < 26; b++) {
+
+  // 2. Dedicated Lower-Field Floating Dots & Stardust (Below the Big Arc - 100 particles)
+  for (let b = 0; b < 100; b++) {
+    const colRnd = o();
     i.push({
-      x: o() * 624,
-      y: 90 + o() * 262,
-      r: 4 + o() * 9,
-      a: 0.05 + o() * 0.12,
-      vy: -(3 + o() * 5),
-      vx: (o() - 0.5) * 4,
-      appear: 1.8 + o() * 2.6,
-      tw: 0.3 + o(),
+      x: -40 + o() * 704,
+      y: 190 + o() * 200, // Concentrated specifically below the arc across lower screen
+      r: 0.75 + o() * 2.2, // Crisp visible dots and glowing motes
+      a: 0.35 + o() * 0.58, // Clearly visible, luminous floating dots
+      vy: -(0.6 + o() * 1.8), // Slow, gentle, organic upward drift
+      vx: (o() - 0.5) * 1.6,
+      appear: o() * 1.6,
+      tw: 0.9 + o() * 2.4,
+      ph: o() * 6.28,
+      bokeh: false,
+      colorType: colRnd > 0.6 ? 0 : colRnd > 0.25 ? 1 : 2,
+    });
+  }
+
+  // 3. Ambient & Lower Bokeh Motes (38 particles)
+  for (let b = 0; b < 38; b++) {
+    i.push({
+      x: -30 + o() * 684,
+      y: 150 + o() * 240, // Distributed across mid and lower fields
+      r: 3.5 + o() * 8.5,
+      a: 0.05 + o() * 0.13,
+      vy: -(1.0 + o() * 2.5),
+      vx: (o() - 0.5) * 2.2,
+      appear: 1.0 + o() * 2.2,
+      tw: 0.4 + o() * 1.2,
       ph: o() * 6.28,
       bokeh: true,
+      colorType: o() > 0.5 ? 1 : 2,
     });
   }
+
   return i;
 }
 
-function Pt(): HTMLCanvasElement | null {
+function createParticleSprite(type: "white" | "blue" | "violet"): HTMLCanvasElement | null {
   if (typeof document === "undefined") return null;
   const n = document.createElement("canvas");
   n.width = n.height = 64;
   const o = n.getContext("2d");
   if (!o) return null;
   const i = o.createRadialGradient(32, 32, 0, 32, 32, 32);
-  i.addColorStop(0, "rgba(255,255,255,1)");
-  i.addColorStop(0.25, "rgba(255,255,255,0.55)");
-  i.addColorStop(1, "rgba(255,255,255,0)");
+
+  if (type === "white") {
+    i.addColorStop(0, "rgba(255, 255, 255, 1)");
+    i.addColorStop(0.25, "rgba(255, 255, 255, 0.65)");
+    i.addColorStop(0.65, "rgba(210, 230, 255, 0.25)");
+    i.addColorStop(1, "rgba(255, 255, 255, 0)");
+  } else if (type === "blue") {
+    i.addColorStop(0, "rgba(220, 240, 255, 1)");
+    i.addColorStop(0.25, "rgba(140, 195, 255, 0.85)");
+    i.addColorStop(0.65, "rgba(80, 140, 255, 0.35)");
+    i.addColorStop(1, "rgba(40, 90, 255, 0)");
+  } else {
+    i.addColorStop(0, "rgba(240, 230, 255, 1)");
+    i.addColorStop(0.25, "rgba(180, 160, 255, 0.8)");
+    i.addColorStop(0.65, "rgba(120, 100, 255, 0.3)");
+    i.addColorStop(1, "rgba(70, 50, 230, 0)");
+  }
+
   o.fillStyle = i;
   o.fillRect(0, 0, 64, 64);
   return n;
 }
 
 /**
- * Big outer arc geometry (Shifted further downward)
+ * Big outer arc geometry:
+ * Stretched wider on both sides (Radius R ~ 350), with bottom apex resting at Y = 248.
+ * This sweeps wide across the viewport and avoids steep narrow U-shape clipping.
  */
 function At(n: number) {
-  const o = n < 0.46 ? 336 : 246 + 90 * Math.exp(-(n - 0.46) / 0.85);
-  // Shifted further downward (+38px)
-  const i = 276 + 14 * Math.exp(-n / 1);
+  const o = n < 0.46 ? 420 : 350 + 70 * Math.exp(-(n - 0.46) / 0.85);
+  const i = 248 + 14 * Math.exp(-n / 1);
   return { R: o, bottom: i, cy: i - o };
 }
 
 /**
- * Inner Dome / Half-donut geometry (Shifted lower to align with the lower arc)
+ * Inner Dome / Half-donut geometry:
+ * Centered right above the bottom apex, sweeping its luminous highlight along the dome.
  */
 function Tt(n: number) {
   const o = 82 + 20 * u(1.3, 2.7, n);
-  return { cx: 312, cy: 262, rx: o, ry: o * 0.96, rot: 0 };
+  return { cx: 312, cy: 236, rx: o, ry: o * 0.96, rot: 0 };
 }
 
 export interface EclipseIntroOptions {
@@ -130,7 +174,10 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
   if (!t) return null;
 
   const it = vt(seed);
-  const lt = Pt();
+  const ltWhite = createParticleSprite("white");
+  const ltBlue = createParticleSprite("blue");
+  const ltViolet = createParticleSprite("violet");
+
   const st =
     typeof matchMedia === "function" &&
     matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -250,8 +297,8 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
     const M = e.cy + e.rx * Math.sin(c);
     const y = 5 + w * 0.6;
     const f = t.createRadialGradient(d, M, 0, d, M, y * 2);
-    f.addColorStop(0, `rgba(255,255,255,${0.85 * S})`);
-    f.addColorStop(0.3, `rgba(${x[0]},${x[1]},${x[2]},${0.45 * S})`);
+    f.addColorStop(0, `rgba(255,255,255,${0.8 * S})`);
+    f.addColorStop(0.3, `rgba(${x[0]},${x[1]},${x[2]},${0.4 * S})`);
     f.addColorStop(1, "rgba(80,110,255,0)");
     t.fillStyle = f;
     t.beginPath();
@@ -355,9 +402,9 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
 
     t.globalCompositeOperation = "lighter";
 
-    // Ambient radial glow
+    // 1. Ambient upper radial glow
     {
-      const r = t.createRadialGradient(312, p, c, 312, p, c * 1.95);
+      const r = t.createRadialGradient(312, p, c, 312, p, c * 1.85);
       r.addColorStop(0, `rgba(10,20,255,${0.24 * v})`);
       r.addColorStop(0.35, `rgba(10,20,255,${0.09 * v})`);
       r.addColorStop(1, "rgba(10,20,255,0)");
@@ -365,7 +412,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
       t.fillRect(T, R, x, $);
     }
 
-    // Concentric blue halo
+    // 2. Concentric blue halo
     {
       const r = Math.min(1.2, S * 3.4);
       const d = t.createRadialGradient(312, p, 0, 312, p, c);
@@ -379,24 +426,46 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
       t.fill();
     }
 
-    // Floating Bokeh and Stardust Particles
-    if (lt) {
-      for (const r of it) {
-        const d = e - r.appear;
-        if (d < 0) continue;
-        const M = u(0, 0.8, d) * (r.bokeh ? u(0, 1.2, d) : 1);
-        const y = 0.65 + 0.35 * Math.sin(e * r.tw + r.ph);
-        const f = r.x + r.vx * e;
-        let h = (r.y + r.vy * e) % 352;
-        if (h < 0) h += 352;
-        t.globalAlpha = L(r.a * M * y * (r.bokeh ? 1 : 0.9));
-        const l = r.r;
-        t.drawImage(lt, f - l * 2, h - l * 2, l * 4, l * 4);
+    // 3. Gentle lower-screen cosmic depth (prevents harsh flat black below the arc)
+    {
+      const lowerGlow = t.createRadialGradient(312, 310, 40, 312, 310, 380);
+      lowerGlow.addColorStop(0, `rgba(24, 32, 110, ${0.16 * v})`);
+      lowerGlow.addColorStop(0.45, `rgba(12, 18, 70, ${0.08 * v})`);
+      lowerGlow.addColorStop(0.85, `rgba(6, 10, 40, ${0.03 * v})`);
+      lowerGlow.addColorStop(1, "rgba(1, 2, 16, 0)");
+      t.fillStyle = lowerGlow;
+      t.fillRect(T, R, x, $);
+    }
+
+    // 4. Floating Stardust Dots & Particles (Rich distribution across upper sky and below arc)
+    const wrapH = Math.max(380, Math.ceil($ + 50));
+    for (const r of it) {
+      const d = e - r.appear;
+      if (d < 0) continue;
+      const M = u(0, 0.8, d) * (r.bokeh ? u(0, 1.2, d) : 1);
+      const y = 0.65 + 0.35 * Math.sin(e * r.tw + r.ph);
+
+      // Subtle organic horizontal drift
+      const f = r.x + r.vx * e + Math.sin(e * 0.7 + r.ph) * 3;
+      let h = (r.y + r.vy * e) % wrapH;
+      if (h < 0) h += wrapH;
+
+      t.globalAlpha = L(r.a * M * y * (r.bokeh ? 1 : 0.95));
+      const l = r.r;
+      const sprite =
+        r.colorType === 2
+          ? ltViolet
+          : r.colorType === 1
+          ? ltBlue
+          : ltWhite;
+
+      if (sprite) {
+        t.drawImage(sprite, f - l * 2, h - l * 2, l * 4, l * 4);
       }
     }
     t.globalAlpha = 1;
 
-    // THE 18-LAYER VOLUMETRIC ARC GLOW (Big Arc)
+    // 5. THE 18-LAYER VOLUMETRIC ARC GLOW (Stretched wide across the screen)
     {
       const r = u(0, 0.08, e);
       const d = 0.5 + 0.45 * u(0, 0.7, e);
@@ -422,7 +491,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
       const G = (X: number[], O: number[]) =>
         `rgb(${X.map((Z, B) => Math.round(D(Z, O[B], g))).join(",")})`;
 
-      const I = t.createLinearGradient(32, 0, 592, 0);
+      const I = t.createLinearGradient(-30, 0, 654, 0);
       I.addColorStop(0, G([170, 150, 255], [255, 252, 255]));
       I.addColorStop(0.3, G([120, 100, 255], [195, 190, 255]));
       I.addColorStop(0.5, G([100, 80, 250], [150, 146, 240]));
@@ -436,29 +505,31 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
       t.globalAlpha = 1;
     }
 
-    // Side flares at big arc intersection
+    // 6. Side flares at big arc intersection (Wider spread outside the navbar)
     {
       const r = -p;
-      const d = Math.atan2(Math.sqrt(Math.max(0, c * c - r * r)), r);
-      const M = P(L(6 + 150 * (e - 0.04), 1, 112));
-      const y = u(d - 0.12, d + 0.25, M) * (0.5 + 0.5 * u(0.4, 1.4, e));
-      if (y > 0.001) {
-        const f = Math.sqrt(Math.max(0, c * c - r * r));
-        for (const h of [-1, 1]) {
-          const l = 312 + h * f;
-          const s = 4;
-          const m = t.createRadialGradient(l, s, 0, l, s, 95);
-          m.addColorStop(0, `rgba(255,250,255,${0.85 * y})`);
-          m.addColorStop(0.18, `rgba(190,180,255,${0.55 * y})`);
-          m.addColorStop(0.5, `rgba(70,70,255,${0.28 * y})`);
-          m.addColorStop(1, "rgba(30,30,255,0)");
-          t.fillStyle = m;
-          t.fillRect(l - 100, s - 100, 200, 200);
+      if (c > r && r > 0) {
+        const d = Math.atan2(Math.sqrt(Math.max(0, c * c - r * r)), r);
+        const M = P(L(6 + 150 * (e - 0.04), 1, 112));
+        const y = u(d - 0.12, d + 0.25, M) * (0.5 + 0.5 * u(0.4, 1.4, e));
+        if (y > 0.001) {
+          const f = Math.sqrt(Math.max(0, c * c - r * r));
+          for (const h of [-1, 1]) {
+            const l = 312 + h * f;
+            const s = 4;
+            const m = t.createRadialGradient(l, s, 0, l, s, 110);
+            m.addColorStop(0, `rgba(255,250,255,${0.85 * y})`);
+            m.addColorStop(0.18, `rgba(190,180,255,${0.55 * y})`);
+            m.addColorStop(0.5, `rgba(70,70,255,${0.28 * y})`);
+            m.addColorStop(1, "rgba(30,30,255,0)");
+            t.fillStyle = m;
+            t.fillRect(l - 120, s - 120, 240, 240);
+          }
         }
       }
     }
 
-    // Upper Dome with flowing highlight (CLIPPED strictly above/inside the Big Outer Arc curve)
+    // 7. Upper Dome with flowing highlight (CLIPPED strictly above/inside the Big Outer Arc curve)
     t.save();
     t.beginPath();
     t.arc(312, p, c, 0, Math.PI * 2);
