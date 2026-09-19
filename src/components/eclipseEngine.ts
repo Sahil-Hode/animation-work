@@ -458,8 +458,13 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
       }
     }
 
-    // Upper Dome with flowing highlight
+    // Upper Dome with flowing highlight (CLIPPED strictly above/inside the Big Outer Arc curve)
+    t.save();
+    t.beginPath();
+    t.arc(312, p, c, 0, Math.PI * 2);
+    t.clip();
     bt(e);
+    t.restore();
 
     canvas.style.opacity = "1";
     t.globalCompositeOperation = "source-over";
