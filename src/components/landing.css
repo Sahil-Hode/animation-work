@@ -122,6 +122,8 @@
   filter: blur(12px);
 
   pointer-events: none;
+  animation: lp-halo-reveal 2s ease-out 1.4s both, lp-halo-breathe 8s ease-in-out 3.4s infinite;
+
 }
 
 
@@ -150,6 +152,7 @@
     );
 
   pointer-events: none;
+  animation: lp-fill-reveal 2s ease-out 1.4s both;
 }
 
 
