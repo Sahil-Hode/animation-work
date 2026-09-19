@@ -157,17 +157,22 @@
 
 
 /* ---------- Middle Half-Donut Object (Rising DOWN -> UP) ---------- */
+/* ---------- Middle Half-Donut Object (Rising DOWN -> UP & Rotating in place) ---------- */
 .lp-arc {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   top: 31%;
   width: clamp(340px, 38vw, 620px);
-  aspect-ratio: 600 / 320;
+  aspect-ratio: 600 / 300;
   pointer-events: none;
   z-index: 1;
   animation: lp-donut-rise-up 1.35s cubic-bezier(0.16, 1, 0.3, 1) 1.85s both;
   will-change: transform, opacity;
+  /* DEDICATED INNER DONUT CLIPPING BOUNDARY */
+  overflow: hidden;
+  clip-path: inset(-100px -100px 3.5% -100px);
+  -webkit-clip-path: inset(-100px -100px 3.5% -100px);
 }
 
 .lp-donut__svg {
@@ -175,6 +180,13 @@
   height: 100%;
   overflow: visible;
   pointer-events: none;
+}
+
+/* Continuous 360-degree rotation of the inner donut around its own fixed center (300, 300) */
+.lp-donut__spinner {
+  transform-origin: 300px 300px;
+  animation: lp-donut-spin 10s linear infinite;
+  will-change: transform;
 }
 
 .lp-donut__outer-rim {
@@ -192,43 +204,23 @@
   filter: drop-shadow(0 -1px 8px rgba(30, 80, 255, 0.45));
 }
 
-/* Endpoint glows: elongated along the half-donut rim */
-.lp-donut__side-halo {
-  fill: none;
-  stroke-width: 8;
+/* Highlight Layers rotating around the rim */
+.lp-donut__hl-halo {
   stroke-linecap: round;
-  filter: url(#lp-endpoint-glow);
-  opacity: 0.85;
 }
 
-.lp-donut__side-core {
-  fill: none;
-  stroke-width: 3.2;
+.lp-donut__hl-mid {
+  stroke-linecap: round;
+}
+
+.lp-donut__hl-core {
   stroke-linecap: round;
   filter: drop-shadow(0 0 4px #ffffff)
           drop-shadow(0 0 12px rgba(220, 200, 255, 0.95))
           drop-shadow(0 0 25px rgba(80, 120, 255, 0.8));
 }
 
-/* Upper-right comet flare hugging the curve */
-.lp-donut__comet-halo {
-  fill: none;
-  stroke-width: 9;
-  stroke-linecap: round;
-  filter: url(#lp-comet-flare-filter);
-  opacity: 0.9;
-}
-
-.lp-donut__comet-core {
-  fill: none;
-  stroke-width: 3.8;
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 5px #ffffff)
-          drop-shadow(0 0 15px rgba(230, 215, 255, 0.95))
-          drop-shadow(0 0 35px rgba(80, 130, 255, 0.85));
-}
-
-.lp-donut__comet-head {
+.lp-donut__hl-star {
   filter: drop-shadow(0 0 6px #ffffff)
           drop-shadow(0 0 16px rgba(230, 210, 255, 1))
           drop-shadow(0 0 32px rgba(100, 150, 255, 0.9));
@@ -934,14 +926,7 @@
 .lp-ring__path,
 .lp-ring__taper,
 .lp-donut__svg,
-.lp-donut__body,
-.lp-donut__outer-rim,
-.lp-donut__inner-rim,
-.lp-donut__side-halo,
-.lp-donut__side-core,
-.lp-donut__comet-halo,
-.lp-donut__comet-core,
-.lp-donut__comet-head {
+.lp-donut__spinner, .lp-donut__outer-rim, .lp-donut__inner-rim, .lp-donut__hl-core, .lp-donut__hl-star {
   will-change: opacity, transform, filter;
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -978,5 +963,15 @@
     animation: none !important;
     stroke-dashoffset: 0 !important;
     opacity: 1 !important;
+  }
+}
+
+
+@keyframes lp-donut-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }

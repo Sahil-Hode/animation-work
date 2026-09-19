@@ -1,7 +1,7 @@
 /**
  * Decorative background: a huge neon ring (only its lower rim is visible)
- * plus an inner half-donut / semicircular arc rising physically from DOWN -> UP
- * with bright white glowing highlights at its endpoints that move with it.
+ * plus an inner rotating donut/torus with a bright white/lavender highlight
+ * that travels around its circumference, clipped so only the upper arc is visible.
  */
 export function GlowRing() {
   return (
@@ -75,164 +75,179 @@ export function GlowRing() {
         </div>
       </div>
 
-      {/* Inner Half-Donut Object physically rising from DOWN -> UP */}
+      {/* Inner Donut Container (Positions, reveals, and clips the rotating object) */}
       <div className="lp-arc">
         <svg
           className="lp-donut__svg"
-          viewBox="0 0 600 320"
+          viewBox="0 0 600 300"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            {/* Multi-layer glowing filters for endpoints and comet */}
-            <filter id="lp-donut-glow" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="3" result="blur1" />
-              <feGaussianBlur stdDeviation="10" result="blur2" />
+            {/* Multi-layer glowing filters for donut highlight and rim */}
+            <filter id="lp-donut-highlight-blur-wide" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="12" result="b1" />
+              <feGaussianBlur stdDeviation="24" result="b2" />
               <feMerge>
-                <feMergeNode in="blur2" />
-                <feMergeNode in="blur1" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-
-            <filter id="lp-endpoint-glow" x="-60%" y="-60%" width="220%" height="220%">
-              <feGaussianBlur stdDeviation="3" result="b1" />
-              <feGaussianBlur stdDeviation="8" result="b2" />
-              <feGaussianBlur stdDeviation="20" result="b3" />
-              <feMerge>
-                <feMergeNode in="b3" />
                 <feMergeNode in="b2" />
                 <feMergeNode in="b1" />
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
 
-            <filter id="lp-comet-flare-filter" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="3" result="cb1" />
-              <feGaussianBlur stdDeviation="10" result="cb2" />
-              <feGaussianBlur stdDeviation="24" result="cb3" />
+            <filter id="lp-donut-highlight-blur-mid" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="5" result="mb1" />
+              <feGaussianBlur stdDeviation="10" result="mb2" />
               <feMerge>
-                <feMergeNode in="cb3" />
-                <feMergeNode in="cb2" />
-                <feMergeNode in="cb1" />
+                <feMergeNode in="mb2" />
+                <feMergeNode in="mb1" />
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
 
-            {/* Gradient fill for the translucent blue donut band */}
-            <linearGradient id="lp-donut-band" x1="300" y1="40" x2="300" y2="300" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="rgba(40, 100, 255, 0.42)" />
-              <stop offset="45%" stopColor="rgba(30, 60, 230, 0.22)" />
-              <stop offset="80%" stopColor="rgba(20, 35, 180, 0.08)" />
-              <stop offset="100%" stopColor="rgba(10, 20, 120, 0.0)" />
+            <filter id="lp-donut-glow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3" result="g1" />
+              <feGaussianBlur stdDeviation="8" result="g2" />
+              <feMerge>
+                <feMergeNode in="g2" />
+                <feMergeNode in="g1" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+
+            {/* Torus body radial gradient for 3D depth and dark center */}
+            <radialGradient id="lp-donut-body-grad" cx="300" cy="300" r="260" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="rgba(5, 7, 25, 0.0)" />
+              <stop offset="78%" stopColor="rgba(15, 30, 160, 0.06)" />
+              <stop offset="86%" stopColor="rgba(40, 85, 255, 0.26)" />
+              <stop offset="95%" stopColor="rgba(60, 120, 255, 0.38)" />
+              <stop offset="100%" stopColor="rgba(25, 60, 210, 0.12)" />
+            </radialGradient>
+
+            {/* Subtle atmospheric rim bloom gradient */}
+            <radialGradient id="lp-donut-rim-bloom" cx="300" cy="300" r="275" gradientUnits="userSpaceOnUse">
+              <stop offset="72%" stopColor="rgba(120, 80, 255, 0.0)" />
+              <stop offset="82%" stopColor="rgba(80, 110, 255, 0.2)" />
+              <stop offset="93%" stopColor="rgba(140, 90, 255, 0.3)" />
+              <stop offset="100%" stopColor="rgba(40, 70, 255, 0.0)" />
+            </radialGradient>
+
+            {/* Moving Highlight Gradients: Pure White Core -> Pale Lavender -> Violet -> Electric Blue */}
+            <linearGradient id="lp-highlight-core" x1="180" y1="50" x2="420" y2="50" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#4070ff" stopOpacity="0" />
+              <stop offset="25%" stopColor="#baa0ff" stopOpacity="0.8" />
+              <stop offset="50%" stopColor="#ffffff" stopOpacity="1" />
+              <stop offset="75%" stopColor="#eeddff" stopOpacity="0.85" />
+              <stop offset="100%" stopColor="#3060ff" stopOpacity="0" />
             </linearGradient>
 
-            {/* Outer and Inner rim gradients that softly taper at the bottom endpoints */}
-            <linearGradient id="lp-outer-rim-grad" x1="300" y1="40" x2="300" y2="300" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#a0c8ff" stopOpacity="0.95" />
-              <stop offset="70%" stopColor="#6595ff" stopOpacity="0.85" />
-              <stop offset="92%" stopColor="#3565ff" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#2045ff" stopOpacity="0.05" />
+            <linearGradient id="lp-highlight-halo" x1="140" y1="50" x2="460" y2="50" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#2550ff" stopOpacity="0" />
+              <stop offset="20%" stopColor="#8055ff" stopOpacity="0.65" />
+              <stop offset="50%" stopColor="#ffd8fc" stopOpacity="0.95" />
+              <stop offset="80%" stopColor="#7550ff" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#2040ff" stopOpacity="0" />
             </linearGradient>
 
-            <linearGradient id="lp-inner-rim-grad" x1="300" y1="85" x2="300" y2="300" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#6595ff" stopOpacity="0.7" />
-              <stop offset="70%" stopColor="#4070ff" stopOpacity="0.5" />
-              <stop offset="92%" stopColor="#2040ff" stopOpacity="0.2" />
-              <stop offset="100%" stopColor="#1020ff" stopOpacity="0.0" />
-            </linearGradient>
-
-            {/* Left endpoint gradient: bright white along the curve, fading softly toward tip and top */}
-            <linearGradient id="lp-left-glow" x1="40" y1="300" x2="75" y2="175" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.4" />
-              <stop offset="20%" stopColor="#ffffff" stopOpacity="1" />
-              <stop offset="45%" stopColor="#eeddff" stopOpacity="0.92" />
-              <stop offset="75%" stopColor="#85a0ff" stopOpacity="0.55" />
-              <stop offset="100%" stopColor="#3050ff" stopOpacity="0" />
-            </linearGradient>
-
-            {/* Right endpoint gradient: bright white along the curve, fading softly toward tip and top */}
-            <linearGradient id="lp-right-glow" x1="560" y1="300" x2="525" y2="175" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.4" />
-              <stop offset="20%" stopColor="#ffffff" stopOpacity="1" />
-              <stop offset="45%" stopColor="#ffd8fa" stopOpacity="0.92" />
-              <stop offset="75%" stopColor="#aa80ff" stopOpacity="0.55" />
-              <stop offset="100%" stopColor="#3050ff" stopOpacity="0" />
-            </linearGradient>
-
-            {/* Upper-right comet gradient hugging the curve */}
-            <linearGradient id="lp-comet-gradient" x1="370" y1="48" x2="520" y2="160" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#5080ff" stopOpacity="0" />
-              <stop offset="25%" stopColor="#d5ccff" stopOpacity="0.75" />
-              <stop offset="65%" stopColor="#ffffff" stopOpacity="1" />
-              <stop offset="88%" stopColor="#eeddff" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#4570ff" stopOpacity="0" />
-            </linearGradient>
+            {/* Viewport clip path ensuring lower portion below y=290 is strictly invisible */}
+            <clipPath id="lp-arc-viewport-clip">
+              <rect x="-100" y="-100" width="800" height="390" />
+            </clipPath>
           </defs>
 
-          {/* Donut band between outer radius 260 and inner radius 215 */}
-          <path
-            className="lp-donut__body"
-            d="M 40 300 A 260 260 0 0 1 560 300 L 515 300 A 215 215 0 0 0 85 300 Z"
-            fill="url(#lp-donut-band)"
-          />
+          {/* Viewport clip ensures lower portions never show behind tagline */}
+          <g clipPath="url(#lp-arc-viewport-clip)">
+            {/* The Entire Donut Object Rotates 360° continuously around its center (300, 300) */}
+            <g className="lp-donut__spinner">
+              {/* Layer 3: Atmospheric Bloom Ring */}
+              <circle
+                cx="300"
+                cy="300"
+                r="237.5"
+                stroke="url(#lp-donut-rim-bloom)"
+                strokeWidth="65"
+                fill="none"
+              />
 
-          {/* Outer electric-blue semicircular rim */}
-          <path
-            className="lp-donut__outer-rim"
-            d="M 40 300 A 260 260 0 0 1 560 300"
-            stroke="url(#lp-outer-rim-grad)"
-          />
+              {/* Layer 1 & 2: Torus Body between r=215 and r=260 (Dark center, luminous body) */}
+              <circle
+                cx="300"
+                cy="300"
+                r="237.5"
+                stroke="url(#lp-donut-body-grad)"
+                strokeWidth="45"
+                fill="none"
+              />
 
-          {/* Inner concentric electric-blue rim */}
-          <path
-            className="lp-donut__inner-rim"
-            d="M 85 300 A 215 215 0 0 1 515 300"
-            stroke="url(#lp-inner-rim-grad)"
-          />
+              {/* Outer Electric Blue Circular Rim */}
+              <circle
+                className="lp-donut__outer-rim"
+                cx="300"
+                cy="300"
+                r="260"
+                fill="none"
+                stroke="#6fa0ff"
+                strokeWidth="2.2"
+                strokeOpacity="0.85"
+                filter="url(#lp-donut-glow)"
+              />
 
-          {/* Left Endpoint Glow: attached to the half-donut left tip, elongated along the curve */}
-          <path
-            className="lp-donut__side-halo lp-donut__side-halo--left"
-            d="M 40 300 A 260 260 0 0 1 75 175"
-            stroke="url(#lp-left-glow)"
-          />
-          <path
-            className="lp-donut__side-core lp-donut__side-core--left"
-            d="M 40 300 A 260 260 0 0 1 75 175"
-            stroke="url(#lp-left-glow)"
-          />
+              {/* Inner Concentric Electric Blue Rim */}
+              <circle
+                className="lp-donut__inner-rim"
+                cx="300"
+                cy="300"
+                r="215"
+                fill="none"
+                stroke="#4575ff"
+                strokeWidth="1.6"
+                strokeOpacity="0.65"
+                filter="url(#lp-donut-glow)"
+              />
 
-          {/* Right Endpoint Glow: attached to the half-donut right tip, elongated along the curve */}
-          <path
-            className="lp-donut__side-halo lp-donut__side-halo--right"
-            d="M 525 175 A 260 260 0 0 1 560 300"
-            stroke="url(#lp-right-glow)"
-          />
-          <path
-            className="lp-donut__side-core lp-donut__side-core--right"
-            d="M 525 175 A 260 260 0 0 1 560 300"
-            stroke="url(#lp-right-glow)"
-          />
+              {/* LAYER 4: The Rotating Luminous White/Lavender Highlight attached to the rim */}
+              {/* Highlight Outer Flare Halo */}
+              <path
+                className="lp-donut__hl-halo"
+                d="M 151 87 A 260 260 0 0 1 449 87"
+                stroke="url(#lp-highlight-halo)"
+                strokeWidth="14"
+                strokeLinecap="round"
+                fill="none"
+                filter="url(#lp-donut-highlight-blur-wide)"
+              />
 
-          {/* Upper-right Comet Flare: hugging the upper-right arc curve */}
-          <path
-            className="lp-donut__comet-halo"
-            d="M 370 48 A 260 260 0 0 1 520 160"
-            stroke="url(#lp-comet-gradient)"
-          />
-          <path
-            className="lp-donut__comet-core"
-            d="M 370 48 A 260 260 0 0 1 520 160"
-            stroke="url(#lp-comet-gradient)"
-          />
-          <circle
-            className="lp-donut__comet-head"
-            cx="472"
-            cy="114"
-            r="3"
-            fill="#ffffff"
-          />
+              {/* Highlight Mid Lavender Bloom */}
+              <path
+                className="lp-donut__hl-mid"
+                d="M 181 68 A 260 260 0 0 1 419 68"
+                stroke="url(#lp-highlight-halo)"
+                strokeWidth="7"
+                strokeLinecap="round"
+                fill="none"
+                filter="url(#lp-donut-highlight-blur-mid)"
+              />
+
+              {/* Highlight Crisp Pure White Core */}
+              <path
+                className="lp-donut__hl-core"
+                d="M 211 56 A 260 260 0 0 1 389 56"
+                stroke="url(#lp-highlight-core)"
+                strokeWidth="3.4"
+                strokeLinecap="round"
+                fill="none"
+              />
+
+              {/* Brilliant Highlight Focal Star Flare */}
+              <circle
+                className="lp-donut__hl-star"
+                cx="300"
+                cy="40"
+                r="3.5"
+                fill="#ffffff"
+              />
+            </g>
+          </g>
         </svg>
       </div>
     </div>
