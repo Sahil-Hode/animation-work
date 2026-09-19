@@ -1,6 +1,7 @@
 /**
  * Eclipse Arc Glow & Particle Engine
- * High-performance Canvas 2D engine with lift-off/exit logic removed so the arc stays in its settled resting position.
+ * Combines the 18-layer volumetric big arc glow with an upper dome / half-donut arc
+ * and flowing luminous highlight that sweeps smoothly along the dome curve without lower circle bleed.
  */
 
 const L = (n: number, o = 0, i = 1) => Math.min(i, Math.max(o, n));
@@ -94,9 +95,7 @@ function Pt(): HTMLCanvasElement | null {
 }
 
 /**
- * Calculates the Arc Radius and Center position over time.
- * The upward lift-off / shoot-up subtraction logic has been completely removed
- * so the arc settles and stays in its resting position.
+ * Big outer arc geometry: settles smoothly at resting coordinates
  */
 function At(n: number) {
   const o = n < 0.46 ? 336 : 246 + 90 * Math.exp(-(n - 0.46) / 0.85);
@@ -104,17 +103,13 @@ function At(n: number) {
   return { R: o, bottom: i, cy: i - o };
 }
 
+/**
+ * Inner Dome / Half-donut geometry (Upper semicircle baseline at cy)
+ */
 function Tt(n: number) {
-  const o = 78 + 23 * u(1.3, 2.7, n);
-  return { cx: 314, cy: 289 - o, rx: o, ry: o * 0.97, rot: 0 };
+  const o = 82 + 20 * u(1.3, 2.7, n);
+  return { cx: 312, cy: 195, rx: o, ry: o * 0.96, rot: 0 };
 }
-
-const ut = (e: number, c: number) => {
-  let a = (e - c) % k;
-  if (a > Math.PI) a -= k;
-  if (a < -Math.PI) a += k;
-  return Math.abs(a);
-};
 
 export interface EclipseIntroOptions {
   onComplete?: () => void;
@@ -166,6 +161,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
     J = (z - 352 * A) / 2;
   }
 
+  // Polygon builder for the 18-layer volumetric arc glow
   function ot(
     e: number,
     c: number,
@@ -198,6 +194,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
     t.closePath();
   }
 
+  // Flowing highlight along the upper dome curve
   function nt(
     e: { cx: number; cy: number; rx: number; ry: number },
     c: number,
@@ -221,7 +218,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
         const I = G < 0 ? a : p;
         const X = Math.min(1, Math.abs(G) / I);
         const O = Math.pow(Math.cos((Math.PI / 2) * X), G < 0 ? 1.4 : 1.8);
-        l.push([Math.cos(g),Math.sin(g), (w + h) * O]);
+        l.push([Math.cos(g), Math.sin(g), (w + h) * O]);
       }
       t.beginPath();
       l.forEach((s, m) => {
@@ -253,8 +250,8 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
     const M = e.cy + e.rx * Math.sin(c);
     const y = 5 + w * 0.6;
     const f = t.createRadialGradient(d, M, 0, d, M, y * 2);
-    f.addColorStop(0, `rgba(255,255,255,${0.8 * S})`);
-    f.addColorStop(0.3, `rgba(${x[0]},${x[1]},${x[2]},${0.4 * S})`);
+    f.addColorStop(0, `rgba(255,255,255,${0.85 * S})`);
+    f.addColorStop(0.3, `rgba(${x[0]},${x[1]},${x[2]},${0.45 * S})`);
     f.addColorStop(1, "rgba(80,110,255,0)");
     t.fillStyle = f;
     t.beginPath();
@@ -262,77 +259,78 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
     t.fill();
   }
 
+  // Upper Dome / Half-Donut with flowing highlight along the dome curve
   function bt(e: number) {
     if (!t) return;
     const c = u(1.15, 1.9, e);
     if (c <= 0.001) return;
     const a = Tt(e);
-    const p = 1;
-    const w = P(35 + 150 * u(1.25, 2.7, e));
-    const S = P(120);
+    const outerR = a.rx;
+    const innerR = a.rx - 22;
+
+    // 1. Torus Body: Upper Half-Donut band between outerR and innerR (Angles Math.PI -> 0)
+    t.save();
+    t.beginPath();
+    t.arc(a.cx, a.cy, outerR, Math.PI, 0, false);
+    t.lineTo(a.cx + innerR, a.cy);
+    t.arc(a.cx, a.cy, innerR, 0, Math.PI, true);
+    t.closePath();
 
     const v = t.createRadialGradient(
       a.cx,
-      a.cy + a.rx * 0.35,
-      a.rx * 0.2,
+      a.cy,
+      innerR * 0.9,
       a.cx,
       a.cy,
-      a.rx * 1.05
+      outerR * 1.05
     );
-    v.addColorStop(0, "rgba(30,60,255,0)");
-    v.addColorStop(0.7, `rgba(40,80,255,${0.1 * c * p * u(1.8, 2.8, e)})`);
-    v.addColorStop(1, `rgba(60,120,255,${0.24 * c * p * u(1.6, 2.6, e)})`);
+    v.addColorStop(0, "rgba(10, 20, 100, 0.0)");
+    v.addColorStop(0.5, `rgba(30, 70, 240, ${0.18 * c})`);
+    v.addColorStop(0.85, `rgba(50, 110, 255, ${0.28 * c})`);
+    v.addColorStop(1, `rgba(80, 150, 255, ${0.12 * c})`);
     t.fillStyle = v;
-    t.beginPath();
-    t.ellipse(a.cx, a.cy, a.rx, a.ry, 0, 0, k);
     t.fill();
 
-    t.lineWidth = 1;
-    const T = u(2, 3.2, e);
-    t.strokeStyle = `rgba(110,110,255,${0.26 * c * p * T})`;
+    // 2. Outer Semicircular Electric-Blue Rim (Upper Dome only)
     t.beginPath();
-    t.arc(a.cx, a.cy - 18, 72, 0, k);
-    t.stroke();
-    t.strokeStyle = `rgba(140,110,255,${0.16 * c * p * T})`;
-    t.beginPath();
-    t.arc(a.cx + 2, a.cy - 32, 58, 0, k);
+    t.arc(a.cx, a.cy, outerR, Math.PI, 0, false);
+    t.strokeStyle = `rgba(110, 175, 255, ${0.85 * c})`;
+    t.lineWidth = 1.8;
     t.stroke();
 
-    const R = 48;
-    const x = t.createConicGradient;
-    const $ = (f: number) => {
-      const h = u(w, w - P(50), ut(f, S));
-      const l = 0.12 + 0.88 * u(-0.3, 0.9, Math.sin(f));
-      return c * h * l * p;
-    };
-    const r = (f: string, h: number, l: number) => {
-      let s: CanvasGradient | string;
-      if (x) {
-        const m = x.call(t, 0, a.cx, a.cy);
-        for (let g = 0; g <= R; g++) {
-          m.addColorStop(g / R, `rgba(${f},${$((g / R) * k) * l})`);
-        }
-        s = m;
-      } else {
-        s = `rgba(${f},${c * 0.6 * l})`;
-      }
-      t.lineWidth = h;
-      t.strokeStyle = s;
+    // 3. Inner Semicircular Rim (Upper Dome only)
+    t.beginPath();
+    t.arc(a.cx, a.cy, innerR, Math.PI, 0, false);
+    t.strokeStyle = `rgba(70, 120, 255, ${0.55 * c})`;
+    t.lineWidth = 1.2;
+    t.stroke();
+
+    // 4. Subtle Endpoint Glows at the left and right baseline
+    for (const h of [-1, 1]) {
+      const ex = a.cx + h * outerR;
+      const ey = a.cy;
+      const eg = t.createRadialGradient(ex, ey, 0, ex, ey, 14);
+      eg.addColorStop(0, `rgba(220, 235, 255, ${0.7 * c})`);
+      eg.addColorStop(0.35, `rgba(90, 130, 255, ${0.4 * c})`);
+      eg.addColorStop(1, "rgba(30, 60, 255, 0)");
+      t.fillStyle = eg;
       t.beginPath();
-      t.arc(a.cx, a.cy, a.rx, 0, k);
-      t.stroke();
-    };
+      t.arc(ex, ey, 14, 0, k);
+      t.fill();
+    }
+    t.restore();
 
-    r("40,90,255", 16, 0.1);
-    r("50,100,255", 8, 0.18);
-    r("70,140,255", 3.2, 0.32);
-    r("120,200,255", 1.5, 1);
+    // 5. Flowing Highlight along the Upper Dome Curve:
+    // Sweeps smoothly across the dome arch (angles -170° to -10°)
+    const angleProgress = (Math.sin((e - 1.5) * 1.8) + 1) / 2; // 0 (left) to 1 (right)
+    const domeAngle = -Math.PI + 0.15 + angleProgress * (Math.PI - 0.3); // sweeps across top apex
 
-    const d = P(-100 + 220 * Math.exp(-(e - 1.9) / 1.4));
-    const M = u(1.3, 1.9, e);
-    nt(a, d, P(20), P(58), 8.5, M * c, u(1.4, 3.8, e));
-    const y = 0.75 * u(1.3, 1.8, e) * c;
-    nt(a, P(198), P(14), P(20), 4.5, y, 0);
+    // Primary moving highlight
+    nt(a, domeAngle, P(18), P(42), 7.5, c * 0.95, u(1.4, 3.8, e));
+
+    // Secondary soft trailing flare
+    const secondAngle = -Math.PI + 0.3 + ((angleProgress + 0.4) % 1) * (Math.PI - 0.6);
+    nt(a, secondAngle, P(12), P(24), 4.5, c * 0.45, 0);
   }
 
   function W(e: number) {
@@ -360,7 +358,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
 
     t.globalCompositeOperation = "lighter";
 
-    // Ambient radial glow
+    // 1. Ambient radial glow
     {
       const r = t.createRadialGradient(312, p, c, 312, p, c * 1.95);
       r.addColorStop(0, `rgba(10,20,255,${0.24 * v})`);
@@ -370,7 +368,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
       t.fillRect(T, R, x, $);
     }
 
-    // Concentric blue halo
+    // 2. Concentric blue halo
     {
       const r = Math.min(1.2, S * 3.4);
       const d = t.createRadialGradient(312, p, 0, 312, p, c);
@@ -384,7 +382,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
       t.fill();
     }
 
-    // Floating Bokeh and Stardust Particles
+    // 3. Floating Bokeh and Stardust Particles
     if (lt) {
       for (const r of it) {
         const d = e - r.appear;
@@ -401,7 +399,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
     }
     t.globalAlpha = 1;
 
-    // THE 18-LAYER VOLUMETRIC ARC GLOW
+    // 4. THE 18-LAYER VOLUMETRIC ARC GLOW (Big Arc)
     {
       const r = u(0, 0.08, e);
       const d = 0.5 + 0.45 * u(0, 0.7, e);
@@ -441,7 +439,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
       t.globalAlpha = 1;
     }
 
-    // Side flares at arc intersection
+    // 5. Side flares at big arc intersection
     {
       const r = -p;
       const d = Math.atan2(Math.sqrt(Math.max(0, c * c - r * r)), r);
@@ -463,7 +461,7 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
       }
     }
 
-    // Inner Donut / Arc
+    // 6. Upper Dome / Half-Donut with flowing highlight along the dome curve
     bt(e);
 
     canvas.style.opacity = "1";
@@ -473,12 +471,10 @@ export function createEclipseIntro(canvas: HTMLCanvasElement, options: EclipseIn
   function Y(e: number) {
     if (!H) return;
     const c = ((e - _) / 1e3) * speed;
-    
-    // Once the arc reaches full reveal (c >= 3.5), it stays permanently in settled position
-    // while allowing particle drift and shimmer to continue forever
+
     if (c >= 3.5) {
-      const settledTime = 3.5 + (c - 3.5) * 0.1;
-      W(settledTime);
+      // Continuous smooth flowing highlight & particle animation
+      W(c);
       if (!j) {
         j = true;
         onComplete?.();
