@@ -531,9 +531,8 @@
   overflow: hidden;
   background:
     radial-gradient(96% 78% at 50% 7%, rgba(66, 82, 255, 0.64) 0%, rgba(20, 36, 132, 0.44) 34%, transparent 72%),
-    radial-gradient(78% 52% at 52% 42%, rgba(61, 92, 255, 0.36) 0%, rgba(26, 26, 255, 0.18) 43%, transparent 74%),
-    radial-gradient(100% 68% at 50% 100%, rgba(11, 20, 72, 0.82) 0%, rgba(4, 7, 24, 0.92) 58%, #02030d 100%),
-    linear-gradient(180deg, #07115c 0%, #040824 46%, #02030d 100%);
+    radial-gradient(78% 38% at 52% 36%, rgba(61, 92, 255, 0.32) 0%, rgba(26, 26, 255, 0.14) 38%, transparent 68%),
+    linear-gradient(180deg, #07115c 0%, #040824 34%, #000000 58%, #000000 100%);
 }
 
 .glass-donut-section::before,
@@ -559,13 +558,13 @@
 
 .glass-donut-section::after {
   left: 50%;
-  bottom: 0;
+  top: 38%;
   width: min(120vw, 1320px);
-  height: 58%;
+  height: 26%;
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(61, 92, 255, 0.2) 0%, rgba(16, 30, 110, 0.22) 42%, transparent 75%);
+    radial-gradient(ellipse at 50% 0%, rgba(61, 92, 255, 0.18) 0%, rgba(16, 30, 110, 0.12) 38%, transparent 72%);
   filter: blur(18px);
-  opacity: 0.84;
+  opacity: 0.62;
   transform: translateX(-50%);
 }
 
